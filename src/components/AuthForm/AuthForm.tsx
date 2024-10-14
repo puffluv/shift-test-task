@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
-import "./index.css";
+import "./AuthForm.modules.css";
 
 interface FormData {
   phone: string;
