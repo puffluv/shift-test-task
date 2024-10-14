@@ -26,8 +26,6 @@ const AuthForm = () => {
       }, 1000);
 
       return () => clearInterval(interval);
-    } else if (timer === 0) {
-      setIsPhoneVerified(false);
     }
   }, [isPhoneVerified, timer]);
 
@@ -70,6 +68,15 @@ const AuthForm = () => {
     }
   };
 
+  const handleResendOtp = async () => {
+    try {
+      setTimer(60);
+      console.log("Код запрошен повторно");
+    } catch (error) {
+      console.error("Ошибка при повторной отправке OTP", error);
+    }
+  };
+
   return (
     <div className="auth-form">
       <h2>Вход</h2>
@@ -98,35 +105,40 @@ const AuthForm = () => {
         </div>
 
         {isPhoneVerified && (
-          <>
-            <div className="form-group">
-              <input
-                type="number"
-                placeholder="Проверочный код"
-                {...register("otp", {
-                  required: "Код должен содержать 6 цифр",
-                  valueAsNumber: true,
-                  validate: (value) =>
-                    (value >= 100000 && value <= 999999) ||
-                    "Код должен содержать 6 цифр",
-                })}
-              />
-              {errors.otp && (
-                <span className="error">{errors.otp.message}</span>
-              )}
-            </div>
-            <p className="timer-text">
-              {timer > 0
-                ? `Запросить код повторно можно через ${timer} секунд`
-                : "Вы можете запросить код повторно"}
-            </p>
-          </>
+          <div className="form-group">
+            <input
+              type="number"
+              placeholder="Проверочный код"
+              {...register("otp", {
+                required: "Код должен содержать 6 цифр",
+                valueAsNumber: true,
+                validate: (value) =>
+                  (value >= 100000 && value <= 999999) ||
+                  "Код должен содержать 6 цифр",
+              })}
+            />
+            {errors.otp && <span className="error">{errors.otp.message}</span>}
+          </div>
         )}
 
         <button type="submit" className="submit-button">
           {isPhoneVerified ? "Войти" : "Продолжить"}
         </button>
       </form>
+
+      {isPhoneVerified && (
+        <p className="timer-text">
+          {timer > 0
+            ? `Запросить код повторно можно через ${timer} секунд`
+            : null}
+        </p>
+      )}
+
+      {isPhoneVerified && timer === 0 && (
+        <p className="resend-link" onClick={handleResendOtp}>
+          Запросить код ещё раз
+        </p>
+      )}
     </div>
   );
 };
