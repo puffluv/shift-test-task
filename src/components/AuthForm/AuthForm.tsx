@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 import "./AuthForm.modules.css";
 
 interface FormData {
@@ -17,6 +18,7 @@ const AuthForm = () => {
     formState: { errors },
     setError,
     reset,
+    getValues,
   } = useForm<FormData>();
 
   useEffect(() => {
@@ -29,56 +31,62 @@ const AuthForm = () => {
     }
   }, [isPhoneVerified, timer]);
 
-  const handlePhoneSubmit = async (data: FormData) => {
+  const handlePhoneSubmit = async (data?: FormData) => {
     try {
-      const formattedPhone = data.phone.startsWith("+7")
-        ? `8${data.phone.slice(2)}`
-        : data.phone;
+      const phone = data ? data.phone : getValues("phone");
+      const formattedPhone = phone.startsWith("+7")
+        ? `8${phone.slice(2)}`
+        : phone;
 
       await axios.post("https://shift-backend.onrender.com/auth/otp", {
         phone: formattedPhone,
       });
-      console.log("OTP отправлен успешно");
+      toast.success("OTP отправлен успешно");
       setIsPhoneVerified(true);
       setTimer(60);
     } catch (error) {
       console.error("Ошибка отправки OTP", error);
+      toast.error("Ошибка при отправке кода");
       setError("phone", { message: "Ошибка при отправке кода" });
     }
   };
 
   const handleOtpSubmit = async (data: FormData) => {
     try {
+      const formattedPhone = data.phone.startsWith("+7")
+        ? `8${data.phone.slice(2)}`
+        : data.phone;
+
       const response = await axios.post(
         "https://shift-backend.onrender.com/users/signin",
         {
-          phone: data.phone.startsWith("+7")
-            ? `8${data.phone.slice(2)}`
-            : data.phone,
-          code: Number(data.otp),
+          phone: formattedPhone,
+          code: data.otp,
         }
       );
+      toast.success("Авторизация успешна");
       console.log("Авторизация успешна", response.data);
       reset();
       setIsPhoneVerified(false);
       setTimer(60);
     } catch (error) {
       console.error("Ошибка авторизации", error);
+      toast.error("Неверный код");
       setError("otp", { message: "Неверный код" });
     }
   };
 
-  const handleResendOtp = async () => {
-    try {
-      setTimer(60);
-      console.log("Код запрошен повторно");
-    } catch (error) {
-      console.error("Ошибка при повторной отправке OTP", error);
-    }
+  const handlePhoneInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.target.value = event.target.value.replace(/[^0-9+]/g, "");
+  };
+
+  const handleOtpInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.target.value = event.target.value.replace(/\D/g, "");
   };
 
   return (
     <div className="auth-form">
+      <Toaster position="top-left" reverseOrder={false} />
       <h2>Вход</h2>
       <p>Введите проверочный код для входа в личный кабинет</p>
 
@@ -98,6 +106,7 @@ const AuthForm = () => {
                 message: "Некорректный номер телефона",
               },
             })}
+            onInput={handlePhoneInput}
           />
           {errors.phone && (
             <span className="error">{errors.phone.message}</span>
@@ -107,15 +116,19 @@ const AuthForm = () => {
         {isPhoneVerified && (
           <div className="form-group">
             <input
-              type="number"
+              type="text"
               placeholder="Проверочный код"
               {...register("otp", {
                 required: "Код должен содержать 6 цифр",
-                valueAsNumber: true,
-                validate: (value) =>
-                  (value >= 100000 && value <= 999999) ||
-                  "Код должен содержать 6 цифр",
+                minLength: 6,
+                maxLength: 6,
+                pattern: {
+                  value: /^\d{6}$/,
+                  message: "Код должен содержать только 6 цифр",
+                },
               })}
+              onInput={handleOtpInput}
+              maxLength={6}
             />
             {errors.otp && <span className="error">{errors.otp.message}</span>}
           </div>
@@ -135,7 +148,7 @@ const AuthForm = () => {
       )}
 
       {isPhoneVerified && timer === 0 && (
-        <p className="resend-link" onClick={handleResendOtp}>
+        <p className="resend-link" onClick={() => handlePhoneSubmit()}>
           Запросить код ещё раз
         </p>
       )}
