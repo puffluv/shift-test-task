@@ -31,19 +31,24 @@ const AuthForm = () => {
     }
   }, [isPhoneVerified, timer]);
 
+  const formatPhone = (phone: string) => {
+    let cleanedPhone = phone.replace(/\D/g, "");
+    return cleanedPhone.startsWith("8")
+      ? `7${cleanedPhone.slice(1)}`
+      : cleanedPhone;
+  };
+
   const handlePhoneSubmit = async (data?: FormData) => {
     try {
       const phone = data ? data.phone : getValues("phone");
-      const formattedPhone = phone.startsWith("+7")
-        ? `8${phone.slice(2)}`
-        : phone;
+      const formattedPhone = formatPhone(phone);
 
       await axios.post("https://shift-backend.onrender.com/auth/otp", {
         phone: formattedPhone,
       });
       toast.success("Код отправлен успешно");
       setIsPhoneVerified(true);
-      setTimer(60000);
+      setTimer(60);
     } catch (error) {
       console.error("Ошибка отправки OTP", error);
       toast.error("Ошибка при отправке кода");
@@ -53,9 +58,7 @@ const AuthForm = () => {
 
   const handleOtpSubmit = async (data: FormData) => {
     try {
-      const formattedPhone = data.phone.startsWith("+7")
-        ? `8${data.phone.slice(2)}`
-        : data.phone;
+      const formattedPhone = formatPhone(data.phone);
 
       const response = await axios.post(
         "https://shift-backend.onrender.com/users/signin",
@@ -68,7 +71,7 @@ const AuthForm = () => {
       console.log("Авторизация успешна", response.data);
       reset();
       setIsPhoneVerified(false);
-      setTimer(60000);
+      setTimer(60);
     } catch (error) {
       console.error("Ошибка авторизации", error);
       toast.error("Неверный код");
@@ -77,7 +80,13 @@ const AuthForm = () => {
   };
 
   const handlePhoneInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.target.value = event.target.value.replace(/[^0-9+]/g, "");
+    let value = event.target.value.replace(/[^\d+]/g, "");
+
+    if (value.length > 1) {
+      value = value.replace(/^(\d)(\d{3})(\d{3})(\d{4})$/, "$1 $2 $3 $4");
+    }
+
+    event.target.value = value;
   };
 
   const handleOtpInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +97,9 @@ const AuthForm = () => {
     <div className="auth-form">
       <Toaster position="top-left" reverseOrder={false} />
       <h2>Вход</h2>
-      <p>Введите проверочный код для входа <br /> в личный кабинет</p>
+      <p>
+        Введите проверочный код для входа <br /> в личный кабинет
+      </p>
 
       <form
         onSubmit={handleSubmit(
@@ -102,15 +113,12 @@ const AuthForm = () => {
             {...register("phone", {
               required: "Поле является обязательным",
               pattern: {
-                value: /^(\+7|8)[0-9]{10}$/,
+                value: /^(\+7|8|7)[\s]?\d{3}[\s]?\d{3}[\s]?\d{4}$/,
                 message: "Некорректный номер телефона",
               },
             })}
             onInput={handlePhoneInput}
           />
-          {errors.phone && (
-            <span className="error">{errors.phone.message}</span>
-          )}
         </div>
 
         {isPhoneVerified && (
@@ -151,7 +159,6 @@ const AuthForm = () => {
           Запросить код ещё раз
         </a>
       )}
-
     </div>
   );
 };
