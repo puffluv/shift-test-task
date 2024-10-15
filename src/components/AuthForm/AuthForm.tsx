@@ -41,9 +41,9 @@ const AuthForm = () => {
       await axios.post("https://shift-backend.onrender.com/auth/otp", {
         phone: formattedPhone,
       });
-      toast.success("OTP отправлен успешно");
+      toast.success("Код отправлен успешно");
       setIsPhoneVerified(true);
-      setTimer(60);
+      setTimer(60000);
     } catch (error) {
       console.error("Ошибка отправки OTP", error);
       toast.error("Ошибка при отправке кода");
@@ -68,7 +68,7 @@ const AuthForm = () => {
       console.log("Авторизация успешна", response.data);
       reset();
       setIsPhoneVerified(false);
-      setTimer(60);
+      setTimer(60000);
     } catch (error) {
       console.error("Ошибка авторизации", error);
       toast.error("Неверный код");
@@ -88,7 +88,7 @@ const AuthForm = () => {
     <div className="auth-form">
       <Toaster position="top-left" reverseOrder={false} />
       <h2>Вход</h2>
-      <p>Введите проверочный код для входа в личный кабинет</p>
+      <p>Введите проверочный код для входа <br /> в личный кабинет</p>
 
       <form
         onSubmit={handleSubmit(
@@ -138,7 +138,6 @@ const AuthForm = () => {
           {isPhoneVerified ? "Войти" : "Продолжить"}
         </button>
       </form>
-
       {isPhoneVerified && (
         <p className="timer-text">
           {timer > 0
@@ -148,10 +147,11 @@ const AuthForm = () => {
       )}
 
       {isPhoneVerified && timer === 0 && (
-        <p className="resend-link" onClick={() => handlePhoneSubmit()}>
+        <a className="resend-link" onClick={() => handlePhoneSubmit()}>
           Запросить код ещё раз
-        </p>
+        </a>
       )}
+
     </div>
   );
 };
