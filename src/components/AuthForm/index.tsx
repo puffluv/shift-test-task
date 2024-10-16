@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./AuthForm.module.css";
+import { errorMessages } from "@/common/errors";
 
 interface FormData {
   phone: string;
@@ -92,10 +93,10 @@ const AuthForm = () => {
             type="tel"
             placeholder="Телефон"
             {...register("phone", {
-              required: "Поле является обязательным",
+              required: errorMessages.requiredField,
               pattern: {
                 value: /^(\+7|8|7)[\s]?\d{3}[\s]?\d{3}[\s]?\d{4}$/,
-                message: "Некорректный номер телефона",
+                message: errorMessages.incorrectPhone,
               },
             })}
             onInput={handlePhoneInput}
@@ -109,12 +110,12 @@ const AuthForm = () => {
               type="text"
               placeholder="Проверочный код"
               {...register("otp", {
-                required: "Код должен содержать 6 цифр",
+                required: errorMessages.requiredOtp,
                 minLength: 6,
                 maxLength: 6,
                 pattern: {
                   value: /^\d{6}$/,
-                  message: "Код должен содержать только 6 цифр",
+                  message: errorMessages.requiredOtp,
                 },
               })}
               onInput={handleOtpInput}

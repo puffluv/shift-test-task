@@ -1,3 +1,4 @@
+import { errorMessages } from "@/common/errors";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -13,7 +14,7 @@ export const sendPhone = createAsyncThunk(
       });
       return phone;
     } catch (error) {
-      return rejectWithValue("Ошибка при отправке кода");
+      return rejectWithValue(errorMessages.sendPhoneError);
     }
   }
 );
@@ -34,7 +35,7 @@ export const sendOtp = createAsyncThunk(
       );
       return response.data;
     } catch (error) {
-      return rejectWithValue("Неверный код");
+      return rejectWithValue(errorMessages.otpError);
     }
   }
 );

@@ -1,3 +1,4 @@
+import { errorMessages } from "@/common/errors";
 import { sendOtp, sendPhone } from "@/store/thunks/auth";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -59,8 +60,10 @@ const authSlice = createSlice({
       })
       .addCase(sendPhone.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload as string;
-        state.error = action.error.message ?? null;
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : errorMessages.sendError;
       })
       .addCase(sendOtp.pending, (state) => {
         state.status = "loading";
@@ -76,7 +79,10 @@ const authSlice = createSlice({
       })
       .addCase(sendOtp.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload as string;
+        state.error =
+          typeof action.payload === "string"
+            ? action.payload
+            : errorMessages.sendError;
       });
   },
 });
