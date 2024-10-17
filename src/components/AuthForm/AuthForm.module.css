@@ -1,4 +1,4 @@
-.auth-form {
+.authForm {
   max-width: 464px;
   margin: 96px 240px 240px;
   padding: 0 40px;
@@ -6,7 +6,7 @@
   font-family: "Inter", sans-serif;
 }
 
-.auth-form h2 {
+.authForm h2 {
   font-weight: 700;
   font-size: 24px;
   line-height: 32px;
@@ -14,7 +14,7 @@
   margin-bottom: 8px;
 }
 
-.auth-form p {
+.authForm p {
   font-weight: 400;
   font-size: 16px;
   line-height: 24px;
@@ -23,7 +23,7 @@
   margin-bottom: 24px;
 }
 
-.form-group {
+.formGroup {
   margin-bottom: 24px;
 }
 
@@ -42,7 +42,7 @@ input:focus {
   border-color: #1e88e5;
 }
 
-.submit-button {
+.submitButton {
   width: 100%;
   max-width: 328px;
   height: 56px;
@@ -61,7 +61,7 @@ input:focus {
   margin-right: auto;
 }
 
-.submit-button:hover {
+.submitButton:hover {
   background-color: #1565c0;
 }
 
@@ -75,7 +75,7 @@ input:focus {
   line-height: 1.4;
 }
 
-.auth-form .timer-text {
+.authForm .timerText {
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
@@ -83,14 +83,14 @@ input:focus {
   margin-top: 40px;
 }
 
-.auth-form .resend-link {
+.authForm .resendLink {
   display: block;
   font-size: 16px;
   font-weight: 600;
   line-height: 24px;
   color: #344051;
   cursor: pointer;
-  margin-top: 16px;
+  margin-top: 40px;
   width: 100%;
   max-width: 328px;
   margin-left: auto;
